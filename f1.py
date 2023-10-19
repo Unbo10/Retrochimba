@@ -8,15 +8,39 @@ pygame.display.set_caption("Retrochimba")
 clock = pygame.time.Clock()
 Minfont = pygame.font.Font('Minecraft.ttf',40)
 
-track = pygame.image.load("images/ind-r-2.png").convert_alpha()
-track.set_alpha(255)
-track_curve_rect = track.get_rect(center = (307, 250))
+# Default sizes for images to scale them
+def_size_S = (225, 500)
+def_size_S_L= (245, 500)
+def_size_S_R = (246, 500)
 
-car1 = pygame.image.load("images/mclaren-f1.png").convert_alpha()
-cari = pygame.transform.scale(car1, (27, 95))
-carR = cari.get_rect(midtop = (250, 385)) #Rectangles are useful for collisions and for getting acurate measurements of where a surface is. Therefore, it will be used in this project
-# car_pos_x = 294
-# car_pos_y = 385 Can be used with a surface, but is not useful with a rectangle
+#BACKGROUND
+S_base = pygame.image.load("images/i-S.png").convert_alpha()
+S_base = pygame.transform.scale(S_base, def_size_S)
+R_S_base = S_base.get_rect(center = (300, 250))
+
+S_barriers_L = pygame.image.load("images/i-S-Lbarrier.png").convert_alpha()
+S_barriers_L = pygame.transform.scale(S_barriers_L, def_size_S_L)
+R_S_barriers_L1 = S_barriers_L.get_rect(midright = (188, 250)) # Problem: images are not loading and they are "waving". Look at the tutorial because that did not happen there
+R_S_barriers_L2 = S_barriers_L.get_rect(midright = (188, -250))
+R_S_barriers_L3 = S_barriers_L.get_rect(midright = (188, -750))
+R_S_barriers_L4 = S_barriers_L.get_rect(midright = (188, -1250))
+
+S_pits = pygame.image.load("images/i-S-pits-NOlogos.png").convert_alpha()
+S_pits = pygame.transform.scale(S_pits, def_size_S_R)
+R_S_pits1 = S_pits.get_rect(midleft = (413, 250))
+S_pits_logos = pygame.image.load("images/i-S-pits-logos.png").convert_alpha()
+S_pits_logos = pygame.transform.scale(S_pits_logos, def_size_S_R)
+R_S_pits_logos = S_pits_logos.get_rect(midleft = (413, -250))
+R_S_pits2 = S_pits.get_rect(midleft = (413, -750))
+S_pits_salida = pygame.image.load("images/i-S-pits-NOlogos.png").convert_alpha() #Cambiar por salida de pits
+S_pits_salida = pygame.transform.scale(S_pits_salida, def_size_S_R)
+R_S_pits_salida = S_pits.get_rect(midleft = (413, -1250))
+
+#CAR AND OTHERS
+car = pygame.image.load("images/f1-mclaren.png").convert_alpha()
+car = pygame.transform.scale(car, (27, 95))
+R_car = car.get_rect(midtop = (300, 385))
+
 Time = Minfont.render("1:25.000", False, "Black") #Boolean for capital letters
 
 #Variables
@@ -51,22 +75,50 @@ while True:
             else:
                 car_pos_x_increment = 0
 
-        if carR.y < 100:
+        if R_car.y < 100:
             game_active = False
 
-        screen.blit(track, (-56.5, 0))
-        # car_pos_y -= 4
-        # screen.blit(car, (car_pos_x,car_pos_y))
-        carR.y -= car_pos_y_increment
-        carR.x += car_pos_x_increment
-        screen.blit(cari, carR)
+        #SHOW BACKGROUND
+        R_S_base.x -= car_pos_x_increment
+        R_S_barriers_L1.x -= car_pos_x_increment
+        R_S_barriers_L2.x -= car_pos_x_increment
+        R_S_barriers_L3.x -= car_pos_x_increment
+        R_S_barriers_L4.x -= car_pos_x_increment
+        R_S_pits1.x -= car_pos_x_increment
+        R_S_pits_logos.x -= car_pos_x_increment
+        R_S_pits2.x -= car_pos_x_increment
+        R_S_pits_salida.x -= car_pos_x_increment
+
+        R_S_base.y += car_pos_y_increment
+        R_S_barriers_L1.y += car_pos_y_increment
+        R_S_barriers_L2.y += car_pos_y_increment
+        R_S_barriers_L3.y += car_pos_y_increment
+        R_S_barriers_L4.y += car_pos_y_increment
+        R_S_pits1.y += car_pos_y_increment
+        R_S_pits_logos.y += car_pos_y_increment
+        R_S_pits2.y += car_pos_y_increment
+        R_S_pits_salida.y += car_pos_y_increment
+
+        screen.blit(S_base, R_S_base)
+        screen.blit(S_barriers_L, R_S_barriers_L1)
+        screen.blit(S_barriers_L, R_S_barriers_L2)
+        screen.blit(S_barriers_L, R_S_barriers_L3)
+        screen.blit(S_barriers_L, R_S_barriers_L4)
+        screen.blit(S_pits, R_S_pits1)
+        screen.blit(S_pits_logos, R_S_pits_logos)
+        screen.blit(S_pits, R_S_pits2)
+        screen.blit(S_pits_salida, R_S_pits_salida)
+
+        #SHOW CAR
+        screen.blit(car, R_car)
+
         # pygame.draw.arc(track, (200, 200, 200), track_curve_rect, m.pi * 0.5, m.pi, 50)
 
         screen.blit(Time, (225,15))
     
     else:
-        track.set_alpha(100)
-        print(track.get_alpha())
+        S_base.set_alpha(100)
+        print(S_base.get_alpha())
 
     pygame.display.update()
     clock.tick(60)
