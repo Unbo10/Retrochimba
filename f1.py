@@ -121,4 +121,4 @@ while True:
         print(S_base.get_alpha())
 
     pygame.display.update()
-    clock.tick(60)
+    clock.tick(30)
