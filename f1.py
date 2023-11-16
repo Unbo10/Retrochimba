@@ -161,16 +161,16 @@ while True:
                     car_pos_x_increment = 0
                 car_pos_y_increment += (0, 0.025, tire, team, fw, rw, deg)[1]
             else:
-              car_pos_x_increment = 0  
+              car_pos_x_increment = 0
         else:
             car_pos_x_increment = 0
 
         #T1
-        if R_S_t1.bottom - 500 >= 0:
-            angle_T1 = (m.atan((R_S_t1.y + 4700)/(1388 + R_S_t1.x))) * 180 / m.pi
-            pygame.transform.rotate(S_t1, angle_T1)
+        if R_S_t1.y + 637 >= 0:
+            angle_T1 = m.degrees((m.asin(abs(R_S_t1.y + 637)/1022)))
+            S_t1 = pygame.transform.rotate(S_t1, angle_T1)
 
-        print(car_pos_x_increment, car_pos_y_increment, R_S_t1.bottom - 500, angle_T1)
+        print(car_pos_x_increment, car_pos_y_increment, R_S_t1.y, angle_T1)
 
         #SHOW BACKGROUND
         R_S_start.x -= int(car_pos_x_increment)
@@ -199,7 +199,7 @@ while True:
         R_S_barriers_L8.x -= int(car_pos_x_increment)
         R_S_pits_exit.x -= int(car_pos_x_increment)
 
-        R_S_t1.x += int (car_pos_x_increment)
+        R_S_t1.x -= int (car_pos_x_increment)
 
 
         
@@ -229,7 +229,7 @@ while True:
         R_S_barriers_L8.y += int(car_pos_y_increment)
         R_S_pits_exit.y += int(car_pos_y_increment)
 
-        R_S_t1.y += int (car_pos_y_increment)
+        R_S_t1.y += int(car_pos_y_increment)
 
 
         screen.blit(S_start, R_S_start)
