@@ -6,10 +6,13 @@ from moviepy.editor import *
 pygame.init()
 pygame.mixer.init()
 screen = pygame.display.set_mode((600, 500))
-pygame.display.set_caption("Retrochimba")
+logo = pygame.image.load("images/logo-title-bar-FC.png").convert_alpha()
+pygame.display.set_icon(logo)
+pygame.display.set_caption("Fórmula Chimba")
 clock = pygame.time.Clock()
 Minfont = pygame.font.Font('Minecraft.ttf',40)
 video = VideoFileClip("images/This-is-Formula-One-Pixelated.mp4")
+
 
 #Speed = acc + 25m/s
 def acceleration(x_increment, y_increment, tires, team, fw, rw, deg):
@@ -38,26 +41,30 @@ def menu(video):
     Minfont_cars = pygame.font.Font('Minecraft.ttf', 16)
     Minfont_title = pygame.font.Font('Minecraft.ttf', 25)
 
+    S_logo = pygame.image.load("images/logo-FC.png").convert_alpha()
+    S_logo = pygame.transform.scale(S_logo, (308, 56))
+    R_S_logo = S_logo.get_rect(midtop = (300, 13))
+
     transparent_surface = pygame.Surface((230, 40), pygame.SRCALPHA)
     pygame.draw.rect(transparent_surface, (255, 255, 255, 128), transparent_surface.get_rect())
-    R_Car_text = pygame.Rect(185, 75, 250, 40)
-    Car_text = Minfont_title.render("Choose your car:", None, "Black")
+    R_S_car_text = pygame.Rect(185, 80, 250, 40)
+    S_car_text = Minfont_title.render("Choose your car:", None, "Black")
 
-    S_Mercedes = pygame.image.load("images/Mercedes-FC-softs.png")
+    S_Mercedes = pygame.image.load("images/Mercedes-FC-softs.png").convert_alpha()
     S_Mercedes = pygame.transform.scale(S_Mercedes,car_size)
-    R_S_Mercedes = S_Mercedes.get_rect(topleft = (26, 125))
+    R_S_Mercedes = S_Mercedes.get_rect(topleft = (24, 127))
     R_S_text_Mercedes = pygame.Rect(R_S_Mercedes.left, R_S_Mercedes.bottom - 9, car_size[0], 30)
     Mercedes_text = Minfont_cars.render("Mercedes W14", None, "Black")
 
-    S_Ferrari = pygame.image.load("images/Ferrari-FC-softs.png")
+    S_Ferrari = pygame.image.load("images/Ferrari-FC-softs.png").convert_alpha()
     S_Ferrari = pygame.transform.scale(S_Ferrari, car_size)
-    R_S_Ferrari = S_Ferrari.get_rect(midtop = (300, 125))
+    R_S_Ferrari = S_Ferrari.get_rect(midtop = (300, 127))
     R_S_text_Ferrari = pygame.Rect(R_S_Ferrari.left, R_S_Ferrari.bottom - 9, car_size[0], 30)
     Ferrari_text = Minfont_cars.render("Ferrari SF-23", None, "Black")
 
-    S_Mclaren = pygame.image.load("images/McLaren-FC-softs.png")
+    S_Mclaren = pygame.image.load("images/McLaren-FC-softs.png").convert_alpha()
     S_Mclaren = pygame.transform.scale(S_Mclaren, car_size)
-    R_S_Mclaren = S_Mclaren.get_rect(topright = (575, 125))
+    R_S_Mclaren = S_Mclaren.get_rect(topright = (577, 127))
     R_S_text_Mclaren = pygame.Rect(R_S_Mclaren.left, R_S_Mclaren.bottom - 9, car_size[0], 30)
     Mclaren_text = Minfont_cars.render("McLaren MCL60", None, "Black")
     
@@ -87,23 +94,29 @@ def menu(video):
                     if event.button == 1:
                         print("Y")
                         pygame.mixer.music.stop()
+                        video.close()
                         play("mercedes")
+                        car_set_up("mercedes")
             if R_S_Ferrari.collidepoint(mouse_pos):
                 print(mouse_pos)
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         print("Y")
                         pygame.mixer.music.stop()
-                        play("ferrari")  
+                        video.close()
+                        car_set_up("ferrari")  
             if R_S_Mclaren.collidepoint(mouse_pos):
                 print(mouse_pos)
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         print("Y")
                         pygame.mixer.music.stop()
-                        play("mclaren")  
-            screen.blit(transparent_surface, (185, 75))        
-            screen.blit(Car_text, (R_Car_text.left + 10, R_Car_text.top + 10))
+                        video.close()
+                        car_set_up("mclaren")  
+
+            screen.blit(S_logo, R_S_logo)
+            screen.blit(transparent_surface, (185, 80))        
+            screen.blit(S_car_text, (R_S_car_text.left + 10, R_S_car_text.top + 10))
             pygame.draw.rect(screen, (12, 229, 192), R_S_text_Mercedes) #If you have time, design a curved botton
             screen.blit(Mercedes_text, (R_S_text_Mercedes.left + 12, R_S_text_Mercedes.top + 9))
             pygame.draw.rect(screen, (239, 26, 45), R_S_text_Ferrari) #If you have time, design a curved botton
@@ -118,9 +131,68 @@ def menu(video):
         pygame.display.update()
         clock.tick(25)
 
+
+#################################################################################################################       
+
+# *** SET UP OF THE CAR ***
+
+def car_set_up (team_name):
+
+    screen.fill((0, 0, 0))
+
+    Minfont_cars = pygame.font.Font('Minecraft.ttf', 16)
+    Minfont_title = pygame.font.Font('Minecraft.ttf', 25)
+    car_size = (128, 316)
+
+    S_logo = pygame.image.load("images/logo-FC.png").convert_alpha()
+    S_logo = pygame.transform.scale(S_logo, (308, 56))
+    R_S_logo = S_logo.get_rect(midtop = (300, 13))
+
+    transparent_surface = pygame.Surface((230, 40), pygame.SRCALPHA)
+    pygame.draw.rect(transparent_surface, (255, 255, 255, 128), transparent_surface.get_rect())
+    R_S_title = pygame.Rect(185, 80, 250, 40)
+    S_title = Minfont_title.render("Choose your car:", None, "Black")
+
+    if team_name == "mercedes":
+        S_car = pygame.image.load("images/Mercedes-FC-softs.png").convert_alpha()
+        S_car = pygame.transform.scale(S_car,car_size)
+        R_S_car = S_car.get_rect(topleft = (24, 127))
+        R_S_car_text = pygame.Rect(R_S_car.left, R_S_car.bottom - 9, car_size[0], 30)
+        car_text = Minfont_cars.render("Mercedes W14", None, "Black")
+    elif team_name == "ferrari":
+        S_car = pygame.image.load("images/Ferrari-FC-softs.png").convert_alpha()
+        S_car = pygame.transform.scale(S_car, car_size)
+        R_S_car = S_car.get_rect(topleft = (24, 127))
+        R_S_car_text = pygame.Rect(R_S_car.left, R_S_car.bottom - 9, car_size[0], 30)
+        S_car_text = Minfont_cars.render("Ferrari SF-23", None, "Black")  
+        print("F")
+    elif team_name == "mclaren":
+        S_car = pygame.image.load("images/McLaren-FC-softs.png").convert_alpha()
+        S_car = pygame.transform.scale(S_car, car_size)
+        R_S_car = S_car.get_rect(topleft = (24, 127))
+        R_S_car_text = pygame.Rect(R_S_car.left, R_S_car.bottom - 9, car_size[0], 30)
+        car_text = Minfont_cars.render("McLaren MCL60", None, "Black")
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+        screen.fill((0, 0, 0))
+        # print("S")
+
+        screen.blit(S_car, R_S_car)
+        screen.blit(S_logo, R_S_logo)
+        screen.blit(S_car_text, R_S_car_text)
+
+        pygame.display.update()
+        clock.tick(30)
+
+
+
+##################################################################################################################       
+
         
-
-
 def play (team_name):
 
     tire = 10
