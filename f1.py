@@ -2,6 +2,7 @@ import pygame
 from sys import exit
 import math as m
 from moviepy.editor import * 
+import random
 
 pygame.init()
 pygame.mixer.init()
@@ -13,25 +14,30 @@ clock = pygame.time.Clock()
 Minfont = pygame.font.Font('Minecraft.ttf',40)
 video = VideoFileClip("images/This-is-Formula-One-Pixelated.mp4")
 
+def play_sound(audio, time):
+    if time > 0:
+        audio.play()
 
 #Speed = acc + 25m/s
-def acceleration(x_increment, y_increment, tires, team, fw, rw, deg):
-    acc = list((0, 0))
+def acceleration(x_increment, y_increment, acc, fw, rw, deg):
+    #  team_name, fw, rw, topspeed, acc, braking, deg, tyre_selected, team_color
+    accel = list((0, 0))
     if (x_increment != 0):
-        acc[0] = x_increment * ((5*(fw + rw)) + deg + (10 * tires) + team) / 500
+        accel[0] = x_increment * ((5*(fw + rw)) - deg + (10 * acc)) / 400
     if (y_increment > 0):
-        acc[1] = y_increment * ((5*(fw + rw)) + deg + (10 * tires) + team) / 500
+        accel[1] = y_increment * ((5*(fw + rw)) + deg + (10 * acc)) / 400
     if (y_increment < 0):
-        acc[1] = y_increment * ((5*(fw + rw)) + deg + (10 * tires) + team) / 100
-    return acc
+        accel[1] = y_increment * ((5*(fw + rw)) + deg + (10 * acc)) / 100
+    return accel
     #Probably we will have to return acceleration on the y-axis and on the x-axis
-def reverse(y_increment, aum_y, tires, team, fw, rw, deg):
+def reverse(y_increment, aum_y, acc, fw, rw, deg):
     if y_increment >= -7:
-        return aum_y * ((5*(fw + rw)) + deg + (10 * tires) + team) / 100
+        return aum_y * ((5*(fw + rw)) + deg + (10 * acc)) / 100
     else:
         return 0
     
 def menu(video):
+    play("ferrari", 10, 10, 10, 10, 10, 10, "M", [0, 0, 0])
     car_size = (128, 326)
     pygame.mixer.music.load('audio/This-is-Formula-One-Pixelated-Audio.mp3')
     pygame.mixer.music.set_volume(0.25)
@@ -172,7 +178,7 @@ def car_set_up (team_name):
     R_S_logo = S_logo.get_rect(midtop = (300, 13))
 
     S_back_button = pygame.image.load("images/back-button.png")
-    S_back_button = pygame.transform.scale(S_back_button, (80, 80))
+    S_back_button = pygame.transform.scale(S_back_button, (56, 56))
     R_S_back_button = S_back_button.get_rect(topleft = (24, R_S_logo.top))
 
     R_S_title = pygame.Rect(200, R_S_logo.bottom + 25, 250, 40)
@@ -461,7 +467,7 @@ def car_set_up (team_name):
             S_play_button_text = Minfont_play.render("LET'S GO RACING", None, (255, 255, 255))
             R_S_play_button_text = S_play_button_text.get_rect(center = (R_S_play_button_background.centerx, R_S_play_button_background.centery + 2))
             if(mouse_buttons[0]):
-                play(team_name, default_fw, default_rw, car_topspeed, car_acceleration, car_braking, car_deg, tyre_selected)
+                play(team_name, default_fw, default_rw, car_topspeed, car_acceleration, car_braking, car_deg, tyre_selected, team_color)
 
 
         screen.blit(S_background, R_S_background)
@@ -526,19 +532,20 @@ def car_set_up (team_name):
 ##################################################################################################################       
 
         
-def play (team_name, fw, rw, topspeed, acc, braking, deg, tyre_selected):
+def play (team_name, fw, rw, topspeed, acc, braking, deg, tyre_selected, team_color):
 
     # Default sizes for images to scale them
     size_S = (225, 500)
     size_S_L= (245, 500)
     size_S_R = (246, 500)
+    starting_position = [328, 1358]
 
     #BACKGROUND
 
     #Track
     S_start = pygame.image.load("images/i-S.png").convert_alpha()
     S_start = pygame.transform.scale(S_start, size_S)
-    R_S_start = S_start.get_rect(center = (300, 250))
+    R_S_start = S_start.get_rect(center = (starting_position[0], 250 + starting_position[1]))
     S_grid = pygame.image.load("images/i-S-grid.png").convert_alpha()
     S_grid = pygame.transform.scale(S_grid, size_S)
     R_S_grid = S_grid.get_rect(midbottom = (R_S_start.midtop))
@@ -549,35 +556,30 @@ def play (team_name, fw, rw, topspeed, acc, braking, deg, tyre_selected):
     R_S_base3 = S_start.get_rect(midbottom = (R_S_base2.midtop))
     R_S_base4 = S_start.get_rect(midbottom = (R_S_base3.midtop))
     R_S_base5 = S_start.get_rect(midbottom = (R_S_base4.midtop))
-    S_t1 = pygame.image.load("images/i-S-T1.png").convert()
-    R_S_t1 = S_t1.get_rect(bottomleft = (188, -3500))
-    R_S_base6 = S_start.get_rect(topleft = (R_S_t1.bottomleft))
 
     S_barriers_L = pygame.image.load("images/i-S-Lbarrier.png").convert_alpha()
     S_barriers_L = pygame.transform.scale(S_barriers_L, size_S_L)
-    R_S_barriers_L1 = S_barriers_L.get_rect(midright = (188, 250))
-    R_S_barriers_L2 = S_barriers_L.get_rect(midright = (188, -250))
-    R_S_barriers_L3 = S_barriers_L.get_rect(midright = (188, -750))
-    R_S_barriers_L4 = S_barriers_L.get_rect(midright = (188, -1250))
-    R_S_barriers_L5 = S_barriers_L.get_rect(midright = (188, -1750))
-    R_S_barriers_L6 = S_barriers_L.get_rect(midright = (188, -2250))
-    R_S_barriers_L7 = S_barriers_L.get_rect(midright = (188, -2750))
-    R_S_barriers_L8 = S_barriers_L.get_rect(midright = (188, -3250))
+    R_S_barriers_L1 = S_barriers_L.get_rect(midright = R_S_start.midleft)
+    R_S_barriers_L2 = S_barriers_L.get_rect(midright = R_S_grid.midleft)
+    R_S_barriers_L3 = S_barriers_L.get_rect(midright = R_S_finish_line.midleft)
+    R_S_barriers_L4 = S_barriers_L.get_rect(midright = R_S_base2.midleft)
+    R_S_barriers_L5 = S_barriers_L.get_rect(midright = R_S_base3.midleft)
+    R_S_barriers_L6 = S_barriers_L.get_rect(midright = R_S_base4.midleft)
+    R_S_barriers_L7 = S_barriers_L.get_rect(midright = R_S_base5.midleft)
 
     S_pits = pygame.image.load("images/i-S-pits-NOlogos.png").convert_alpha()
     S_pits = pygame.transform.scale(S_pits, size_S_R)
-    R_S_pits1 = S_pits.get_rect(midleft = (413, 250))
+    R_S_pits1 = S_pits.get_rect(midleft = R_S_start.midright)
     S_pits_logos = pygame.image.load("images/i-S-pits-logos.png").convert_alpha()
     S_pits_logos = pygame.transform.scale(S_pits_logos, size_S_R)
-    R_S_pits_logos = S_pits_logos.get_rect(midleft = (413, -250))
-    R_S_pits_logos2 = S_pits_logos.get_rect(midleft = (413, -750))
-    R_S_pits2 = S_pits.get_rect(midleft = (413, -1250))
-    R_S_pits3 = S_pits.get_rect(midleft = (413, -1750))
-    R_S_pits4 = S_pits.get_rect(midleft = (413, -2250))
-    R_S_pits5 = S_pits.get_rect(midleft = (413, -2750))
+    R_S_pits_logos = S_pits_logos.get_rect(midleft = R_S_grid.midright)
+    R_S_pits_logos2 = S_pits_logos.get_rect(midleft = R_S_finish_line.midright)
+    R_S_pits2 = S_pits.get_rect(midleft = R_S_base2.midright)
+    R_S_pits3 = S_pits.get_rect(midleft = R_S_base3.midright)
+    R_S_pits4 = S_pits.get_rect(midleft = R_S_base4.midright)
     S_pits_exit = pygame.image.load("images/i-S-pits-exit.png").convert_alpha()
     S_pits_exit = pygame.transform.scale(S_pits_exit, size_S_R)
-    R_S_pits_exit = S_pits.get_rect(midleft = (413, -3250))
+    R_S_pits_exit = S_pits.get_rect(midleft = (R_S_base2.midright))
 
 
     #CAR AND OTHERS
@@ -620,7 +622,17 @@ def play (team_name, fw, rw, topspeed, acc, braking, deg, tyre_selected):
     #Variables
     car_pos_y_increment = float(0)
     car_pos_x_increment = 0
-    game_active = True
+    start_menu = 0
+    game_active = False
+    start_menu = True
+    lights_out = False
+    disappear_time = random.randint(1, 1500)
+
+    S_lights_background = pygame.Surface((275, 80))
+    S_lights_background.fill((245, 245, 245))
+    S_lights = pygame.Surface((32, 32))
+    S_lights.fill((0, 0, 0))
+    audio = pygame.mixer.Sound("audio/light-out.mp3")
 
     while True:
         for event in pygame.event.get():
@@ -629,63 +641,152 @@ def play (team_name, fw, rw, topspeed, acc, braking, deg, tyre_selected):
                 exit()
         screen.fill((0, 0, 0))
 
+        ########################################################################################################
+
+        if start_menu == True:
+            screen.blit(S_finish_line, R_S_finish_line)
+            screen.blit(S_barriers_L, R_S_barriers_L3)
+            screen.blit(S_pits_logos, R_S_pits_logos2)
+            screen.blit(S_start, R_S_base2)
+            screen.blit(S_barriers_L, R_S_barriers_L4)
+            screen.blit(S_pits_logos, R_S_pits2)
+
+            mouse_pos_x, mouse_pos_y = pygame.mouse.get_pos()
+            mouse_buttons = pygame.mouse.get_pressed()
+
+            S_background = pygame.image.load("images/start-menu.png")
+            S_background = pygame.transform.scale(S_background, (550, 450))
+            R_S_background = S_background.get_rect(center = (300, 250))
+
+            S_best_laps_background = pygame.Surface((150, 23))
+            S_best_laps_background.fill(team_color)
+            R_S_best_laps_background = S_best_laps_background.get_rect(topleft = (R_S_background.left + 350, R_S_background.top + 85))
+
+            R_S_lights_background = S_lights_background.get_rect(bottomleft = (R_S_background.left + 45, R_S_background.bottom - 53))
+
+            S_logo = pygame.image.load("images/logo-FC.png").convert_alpha()
+            S_logo = pygame.transform.scale(S_logo, (308, 56))
+            R_S_logo = S_logo.get_rect(midtop = (R_S_background.centerx, R_S_background.top + 4))
+            screen.blit(S_best_laps_background, R_S_best_laps_background)
+            screen.blit(S_lights_background, R_S_lights_background)
+            screen.blit(S_background, R_S_background)
+            screen.blit(S_logo, R_S_logo)
+
+            if R_S_lights_background.collidepoint(mouse_pos_x, mouse_pos_y):
+                S_lights_background.fill(team_color)
+                if mouse_buttons[0]:
+                    lights_out = True
+            else:
+                S_lights_background.fill((245, 245, 245))
+        
+        #############################################################################################################
+
+        if lights_out == True:
+            screen.blit(S_finish_line, R_S_finish_line)
+            screen.blit(S_barriers_L, R_S_barriers_L3)
+            screen.blit(S_pits_logos, R_S_pits_logos2)
+            screen.blit(S_start, R_S_base2)
+            screen.blit(S_barriers_L, R_S_barriers_L4)
+            screen.blit(S_pits_logos, R_S_pits2)
+
+            current_time = pygame.time.get_ticks()
+            S_lights_out = pygame.image.load("images/lights-out.png")
+            S_lights_out = pygame.transform.scale(S_lights_out, (300, 50))
+            R_S_lights_out = S_lights_out.get_rect(center = (300, 250))
+
+            R_S_lights_1 = S_lights.get_rect(topleft = (R_S_lights_out.left + 16, R_S_lights_out.top + 9))
+            R_S_lights_2 = S_lights.get_rect(topleft = (R_S_lights_1.right + 27, R_S_lights_1.top))
+            R_S_lights_3 = S_lights.get_rect(topleft = (R_S_lights_2.right + 27, R_S_lights_2.top))
+            R_S_lights_4 = S_lights.get_rect(topleft = (R_S_lights_3.right + 27, R_S_lights_3.top))
+            R_S_lights_5 = S_lights.get_rect(topleft = (R_S_lights_4.right + 27, R_S_lights_4.top))
+            if current_time > 3000:
+                play_sound(audio, 3050 - current_time)
+                S_lights.fill((239, 0, 1))
+                screen.blit(S_lights, R_S_lights_1)
+                if current_time > 4000:
+                    play_sound(audio, 4050 - current_time)
+                    screen.blit(S_lights, R_S_lights_2)
+                    if current_time > 5000:
+                        play_sound(audio, 5050 - current_time)
+                        screen.blit(S_lights, R_S_lights_3)
+                        if current_time > 6000:
+                            play_sound(audio, 6050 - current_time)
+                            screen.blit(S_lights, R_S_lights_4)
+                            if current_time > 7000:
+                                play_sound(audio, 7050 - current_time)
+                                screen.blit(S_lights, R_S_lights_5)
+                                if current_time > 9000 - disappear_time:
+                                    S_lights.fill((0, 0, 0))
+                                    if current_time > 9000 + 500 - disappear_time:
+                                        game_active = True
+                                        start_menu = False
+                                        screen.fill((0, 0, 0))
+            screen.blit(S_lights_out, R_S_lights_out)
+            screen.blit(car, R_car)
+            print(9000 + 500 - disappear_time, current_time)
+
+
         if game_active == True:
             keys = pygame.key.get_pressed() #Get all the keys getting pressed in every frame
+            if keys[pygame.K_ESCAPE]:
+                lights_out = True
+                game_active = False
             if keys[pygame.K_UP]:
+                # x_increment, y_increment, acc, fw, rw, deg
                 if keys[pygame.K_LEFT]:
-                    aum_x, aum_y = acceleration(-0.10, 0.25, tire, team, fw, rw, deg)
+                    aum_x, aum_y = acceleration(-0.10, 0.25, acc, fw, rw, deg)
                     car_pos_y_increment += aum_y
                     car_pos_x_increment += aum_x
                 elif keys[pygame.K_RIGHT]:
-                    aum_x, aum_y = acceleration(0.10, 0.25, tire, team, fw, rw, deg)
+                    aum_x, aum_y = acceleration(0.10, 0.25, acc, fw, rw, deg)
                     car_pos_y_increment += aum_y
                     car_pos_x_increment += aum_x 
                 else:
                     car_pos_x_increment = 0
-                    car_pos_y_increment += acceleration(0, 0.25, tire, team, fw, rw, deg)[1] 
+                    car_pos_y_increment += acceleration(0, 0.25, acc, fw, rw, deg)[1] 
             elif keys[pygame.K_DOWN] and (car_pos_y_increment >= 0):
                 if keys[pygame.K_LEFT]:
-                    aum_x, aum_y = acceleration(-0.15, -0.10, tire, team, fw, rw, deg)
+                    aum_x, aum_y = acceleration(-0.15, -0.10, acc, fw, rw, deg)
                     car_pos_x_increment += aum_x
                     car_pos_y_increment += aum_y
                 if keys[pygame.K_RIGHT]:
-                    aum_x, aum_y = acceleration(0.15, -0.10, tire, team, fw, rw, deg)
+                    aum_x, aum_y = acceleration(0.15, -0.10, acc, fw, rw, deg)
                     car_pos_x_increment += aum_x
                     car_pos_y_increment += aum_y
                 else:
                     car_pos_x_increment = 0
-                    car_pos_y_increment += acceleration(0, -0.15, tire, team, fw, rw, deg)[1]
+                    car_pos_y_increment += acceleration(0, -0.15, acc, fw, rw, deg)[1]
             elif car_pos_y_increment > 0:
                 if keys[pygame.K_LEFT]:
-                    aum_x, aum_y = acceleration (-0.15, -0.025, tire, team, fw, rw, deg)
+                    aum_x, aum_y = acceleration (-0.15, -0.025, acc, fw, rw, deg)
                     car_pos_x_increment += aum_x
                     car_pos_y_increment += aum_y
                 elif keys[pygame.K_RIGHT]:
-                    aum_x, aum_y = acceleration (0.15, -0.025, tire, team, fw, rw, deg)
+                    aum_x, aum_y = acceleration (0.15, -0.025, acc, fw, rw, deg)
                     car_pos_x_increment += aum_x
                     car_pos_y_increment += aum_y
                 else:
                     car_pos_x_increment = 0
-                    car_pos_y_increment += (0, -0.025, tire, team, fw, rw, deg)[1]
+                    car_pos_y_increment += (0, -0.025, acc, fw, rw, deg)[1]
             elif car_pos_y_increment < 0:
                 if keys[pygame.K_DOWN] and keys[pygame.K_r]:
-                    car_pos_y_increment += reverse(car_pos_y_increment, -0.10, tire, team, fw, rw, deg)
+                    car_pos_y_increment += reverse(car_pos_y_increment, -0.10, acc, fw, rw, deg)
                     if keys[pygame.K_LEFT]:
-                        aum_x= acceleration (-0.15, 0, tire, team, fw, rw, deg)[0]
+                        aum_x= acceleration (-0.15, 0, acc, fw, rw, deg)[0]
                         car_pos_x_increment += aum_x
                     elif keys[pygame.K_RIGHT]:
-                        aum_x= acceleration (0.15, 0, tire, team, fw, rw, deg)[0]
+                        aum_x= acceleration (0.15, 0, acc, fw, rw, deg)[0]
                         car_pos_x_increment += aum_x
                 elif car_pos_y_increment >= 0.5 or car_pos_y_increment <= -0.5:
                     if keys[pygame.K_LEFT]:
-                        aum_x= acceleration (-0.15, 0, tire, team, fw, rw, deg)[0]
+                        aum_x= acceleration (-0.15, 0, acc, fw, rw, deg)[0]
                         car_pos_x_increment += aum_x
                     elif keys[pygame.K_RIGHT]:
-                        aum_x= acceleration (0.15, 0, tire, team, fw, rw, deg)[0]
+                        aum_x= acceleration (0.15, 0, acc, fw, rw, deg)[0]
                         car_pos_x_increment += aum_x
                     else:
                         car_pos_x_increment = 0
-                        car_pos_y_increment += (0, 0.025, tire, team, fw, rw, deg)[1]
+                        car_pos_y_increment += (0, 0.025, acc, fw, rw, deg)[1]
                 else:
                     car_pos_x_increment = 0
             else:
@@ -697,13 +798,13 @@ def play (team_name, fw, rw, topspeed, acc, braking, deg, tyre_selected):
             #     car = pygame.transform.rotate(car, -1)
 
             #T1
-            if R_S_t1.y + 637 > 0:
-                print((m.asin(abs(R_S_t1.y + 637)/1022)))
-                S_t1 = pygame.image.load("images/i-S-T1.png").convert()
-                S_t1 = pygame.transform.rotate(S_t1, m.degrees(m.asin(abs(R_S_t1.y + 637)/1022)))
-                S_start = pygame.image.load("images/i-S.png").convert_alpha()
-                S_start = pygame.transform.scale(S_start, size_S)
-                S_start = pygame.transform.rotate(S_start, m.degrees(m.asin(abs(R_S_t1.y + 637)/1022)))
+            # if R_S_t1.y + 637 > 0:
+            #     print((m.asin(abs(R_S_t1.y + 637)/1022)))
+            #     S_t1 = pygame.image.load("images/i-S-T1.png").convert()
+            #     S_t1 = pygame.transform.rotate(S_t1, m.degrees(m.asin(abs(R_S_t1.y + 637)/1022)))
+            #     S_start = pygame.image.load("images/i-S.png").convert_alpha()
+            #     S_start = pygame.transform.scale(S_start, size_S)
+            #     S_start = pygame.transform.rotate(S_start, m.degrees(m.asin(abs(R_S_t1.y + 637)/1022)))
 
             #FOCUS ON THE OTHER STUFF!!!!!!
 
@@ -731,9 +832,6 @@ def play (team_name, fw, rw, topspeed, acc, braking, deg, tyre_selected):
             R_S_pits4.x -= int(car_pos_x_increment)
             R_S_base5.x -= int(car_pos_x_increment)
             R_S_barriers_L7.x -= int(car_pos_x_increment)
-            R_S_pits5.x -= int(car_pos_x_increment)
-            R_S_base6.x -= int(car_pos_x_increment)
-            R_S_barriers_L8.x -= int(car_pos_x_increment)
             R_S_pits_exit.x -= int(car_pos_x_increment)
 
             # R_S_t1.x -= int (car_pos_x_increment)
@@ -761,15 +859,9 @@ def play (team_name, fw, rw, topspeed, acc, braking, deg, tyre_selected):
             R_S_pits4.y += int(car_pos_y_increment)
             R_S_base5.y += int(car_pos_y_increment)
             R_S_barriers_L7.y += int(car_pos_y_increment)
-            R_S_pits5.y += int(car_pos_y_increment)
-            R_S_base6.y += int(car_pos_y_increment)
-            R_S_barriers_L8.y += int(car_pos_y_increment)
             R_S_pits_exit.y += int(car_pos_y_increment)
 
-            R_S_t1.y += int(car_pos_y_increment)
 
-
-            screen.blit(S_t1, R_S_t1)
 
             screen.blit(S_start, R_S_start)
             screen.blit(S_barriers_L, R_S_barriers_L1)        
@@ -792,9 +884,6 @@ def play (team_name, fw, rw, topspeed, acc, braking, deg, tyre_selected):
             screen.blit(S_pits, R_S_pits4)
             screen.blit(S_start, R_S_base5)
             screen.blit(S_barriers_L, R_S_barriers_L7)
-            screen.blit(S_pits, R_S_pits5)
-            screen.blit(S_start, R_S_base6)
-            screen.blit(S_barriers_L, R_S_barriers_L8)
             screen.blit(S_pits_exit, R_S_pits_exit)
 
 
@@ -807,10 +896,7 @@ def play (team_name, fw, rw, topspeed, acc, braking, deg, tyre_selected):
             screen.blit(car, R_car)
 
             screen.blit(Time, (225,15))
-            pygame.display.update()
-            clock.tick(30)
-        else:
-            S_finish_line.set_alpha(100)
-            print(S_finish_line.get_alpha())
+        pygame.display.update()
+        clock.tick(30)
 
 menu(video)      
