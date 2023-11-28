@@ -3,6 +3,7 @@ from sys import exit
 import math as m
 from moviepy.editor import * 
 import random
+import datetime
 
 pygame.init()
 pygame.mixer.init()
@@ -15,6 +16,11 @@ Minfont = pygame.font.Font('Minecraft.ttf',40)
 video = VideoFileClip("images/This-is-Formula-One-Pixelated.mp4")
 lap_times = [["Last session", "0:00.000", "0:00.000", "0:00.000", "images/f1-mercedes-softs.png"], ["Best session", "0:00.000", "0:00.000", "0:00.000", "images/f1-ferrari-hards.png"]]
 
+def get_lap_time(time):
+    if time != 0:
+        return time
+    else:
+        return datetime.datetime.now()
 
 def play_sound(audio, time):
     if time > 0:
@@ -47,6 +53,8 @@ def reverse(y_increment, aum_y, acc, fw, rw, deg):
         return 0
     
 def menu(video, lap_times):
+    current_time = 0
+
     # play("ferrari", 10, 10, 10, 10, 10, 10, "M", [0, 0, 0])
     car_size = (128, 326)
     pygame.mixer.music.load('audio/This-is-Formula-One-Pixelated-Audio.mp3')
@@ -318,7 +326,7 @@ def car_set_up (team_name, lap_times):
 
         if (R_S_back_button.collidepoint(mouse_pos_x, mouse_pos_y)):
             if(mouse_buttons[0]):
-                menu(VideoFileClip("images/This-is-Formula-One-Pixelated.mp4"))
+                menu(VideoFileClip("images/This-is-Formula-One-Pixelated.mp4"), lap_times)
 
         if (R_S_car.right + 12 < mouse_pos_x < R_S_Tyre_placer.right - 12):
             if (R_S_car.top + 12 < mouse_pos_y < R_S_Soft_tyre.bottom + 5):
@@ -476,7 +484,6 @@ def car_set_up (team_name, lap_times):
                 default_rw += 1
                 click_time = current_time
 
-        print(R_S_Tyre_placer.bottom - R_S_braking.bottom)
 
         if team_name == "mclaren":
             if tyre_selected == "S":
@@ -516,6 +523,7 @@ def car_set_up (team_name, lap_times):
             S_play_button_text = Minfont_play.render("LET'S GO RACING", None, (255, 255, 255))
             R_S_play_button_text = S_play_button_text.get_rect(center = (R_S_play_button_background.centerx, R_S_play_button_background.centery + 2))
             if(mouse_buttons[0]):
+                lap_times[0][4] = chosen_car
                 play(team_name, chosen_car, default_fw, default_rw, car_topspeed, car_acceleration, car_braking, car_deg, tyre_selected, team_color, lap_times)
 
 
@@ -602,11 +610,20 @@ def play (team_name, chosen_car, fw, rw, topspeed, acc, braking, deg, tyre_selec
     R_S_grid = S_grid.get_rect(midbottom = (R_S_start.midtop))
     S_finish_line = pygame.image.load("images/i-S-finish-line.png").convert_alpha()
     S_finish_line = pygame.transform.scale(S_finish_line, size_S)
+    S_chicane_1 = pygame.image.load("images/i-S-chicane.png")
+    S_chicane_1 = pygame.transform.scale(S_chicane_1, size_S)
     R_S_finish_line = S_finish_line.get_rect(midbottom = (R_S_grid.midtop))
     R_S_base2 = S_start.get_rect(midbottom = (R_S_finish_line.midtop))
     R_S_base3 = S_start.get_rect(midbottom = (R_S_base2.midtop))
     R_S_base4 = S_start.get_rect(midbottom = (R_S_base3.midtop))
     R_S_base5 = S_start.get_rect(midbottom = (R_S_base4.midtop))
+    R_S_chicane_1 = S_chicane_1.get_rect(midbottom = (R_S_base5.midtop))
+    R_S_base6 = S_start.get_rect(midbottom = (R_S_chicane_1.midtop))
+    R_S_base7 = S_start.get_rect(midbottom = (R_S_base6.midtop))
+    S_chicane_2 = pygame.transform.rotate(S_chicane_1, 180)
+    R_S_chicane_2 = S_chicane_1.get_rect(midbottom = (R_S_base7.midtop))
+    R_S_base_final = S_start.get_rect(midbottom = (R_S_chicane_2.midtop))
+
 
     S_barriers_L = pygame.image.load("images/i-S-Lbarrier.png").convert_alpha()
     S_barriers_L = pygame.transform.scale(S_barriers_L, size_S_L)
@@ -617,6 +634,14 @@ def play (team_name, chosen_car, fw, rw, topspeed, acc, braking, deg, tyre_selec
     R_S_barriers_L5 = S_barriers_L.get_rect(midright = R_S_base3.midleft)
     R_S_barriers_L6 = S_barriers_L.get_rect(midright = R_S_base4.midleft)
     R_S_barriers_L7 = S_barriers_L.get_rect(midright = R_S_base5.midleft)
+    R_S_barriers_L8 = S_barriers_L.get_rect(midright = R_S_chicane_1.midleft)
+    R_S_barriers_L9 = S_barriers_L.get_rect(midright = R_S_base6.midleft)
+    R_S_barriers_L10 = S_barriers_L.get_rect(midright = R_S_base7.midleft)
+    R_S_barriers_L11 = S_barriers_L.get_rect(midright = R_S_chicane_2.midleft)
+    R_S_barriers_L12 = S_barriers_L.get_rect(midright = R_S_base_final.midleft)
+
+
+
 
     S_pits = pygame.image.load("images/i-S-pits-NOlogos.png").convert_alpha()
     S_pits = pygame.transform.scale(S_pits, size_S_R)
@@ -630,14 +655,20 @@ def play (team_name, chosen_car, fw, rw, topspeed, acc, braking, deg, tyre_selec
     R_S_pits4 = S_pits.get_rect(midleft = R_S_base4.midright)
     S_pits_exit = pygame.image.load("images/i-S-pits-exit.png").convert_alpha()
     S_pits_exit = pygame.transform.scale(S_pits_exit, size_S_R)
-    R_S_pits_exit = S_pits.get_rect(midleft = (R_S_base2.midright))
+    R_S_pits_exit = S_pits.get_rect(midleft = (R_S_base5.midright))
+    S_barriers_R = pygame.transform.rotate(S_barriers_L, 180)
+    R_S_barriers_R8 = S_barriers_R.get_rect(midleft = R_S_chicane_1.midright)
+    R_S_barriers_R9 = S_barriers_R.get_rect(midleft = R_S_base6.midright)
+    R_S_barriers_R10 = S_barriers_R.get_rect(midleft = R_S_base7.midright)
+    R_S_barriers_R11 = S_barriers_R.get_rect(midleft = R_S_chicane_2.midright)
+    R_S_barriers_R12 = S_barriers_R.get_rect(midleft = R_S_base_final.midright)
+
 
     #CAR AND OTHERS
     
     car = pygame.image.load(chosen_car).convert_alpha()
     car = pygame.transform.scale(car, (27, 95))
     R_car = car.get_rect(center = (300, 433))
-    Time = Minfont.render("1:25.000", False, "Black") #Boolean for capital letters
 
     #Variables
     car_pos_y_increment = float(0)
@@ -650,9 +681,19 @@ def play (team_name, chosen_car, fw, rw, topspeed, acc, braking, deg, tyre_selec
     lights_out_time = 0
     angle = 0
     laps = 0
+    lap_counter = -1
     audio_braking =  ""
     audio_accelerating =  ""
     audio_cornering =  ""
+    audio_soundtrack = pygame.mixer.Sound("audio/F1-soundtrack.mp3")
+    audio_soundtrack.play(-1)
+    start_time = 0
+    start_time_condition = True
+    end_time = 0
+    end_time_condition = True
+    Time = Minfont.render(lap_times[0][lap_counter + 1], False, "Black")
+
+
 
     S_lights_background = pygame.Surface((275, 80))
     S_lights_background.fill((245, 245, 245))
@@ -715,31 +756,55 @@ def play (team_name, chosen_car, fw, rw, topspeed, acc, braking, deg, tyre_selec
             S_logo = pygame.transform.scale(S_logo, (308, 56))
             R_S_logo = S_logo.get_rect(midtop = (R_S_background.centerx, R_S_background.top + 4))
 
+            S_back_button = pygame.image.load("images/back-button.png")
+            S_back_button = pygame.transform.scale(S_back_button, (56, 56))
+            R_S_back_button = S_back_button.get_rect(topleft = (R_S_background.left + 45, R_S_logo.top))
+
             S_last_laptime_1 = Minfont_times.render(lap_times[0][1], None, (0, 0, 0))
             S_last_laptime_2 = Minfont_times.render(lap_times[0][2], None, (0, 0, 0))
             S_last_laptime_3 = Minfont_times.render(lap_times[0][3], None, (0, 0, 0))
-            S_last_car = pygame.image.load(lap_times[0][4])
+            S_last_car = pygame.image.load(lap_times[0][4]).convert_alpha()
             S_last_car = pygame.transform.scale(S_last_car, (27, 95))
+            S_last_laptime_text = Minfont_times.render(lap_times[0][0], None, (0, 0, 0))
+
             R_S_last_laptime_1 = S_last_laptime_1.get_rect(center = (472, 191))
             R_S_last_laptime_2 = S_last_laptime_1.get_rect(midtop = (R_S_last_laptime_1.centerx, R_S_last_laptime_1.bottom + 15))
             R_S_last_laptime_3 = S_last_laptime_1.get_rect(midtop = (R_S_last_laptime_2.centerx, R_S_last_laptime_2.bottom + 14))
             R_S_last_car = S_last_car.get_rect(topleft = (R_S_last_laptime_1.left - 65, R_S_last_laptime_1.top - 10))
+            R_S_last_laptime_text = S_last_laptime_text.get_rect(center = (R_S_last_laptime_1.centerx - 22, R_S_last_laptime_1.top - 60))
 
-            S_best_laptime_1 = Minfont_times.render(lap_times[0][1], None, (0, 0, 0))
-            S_best_laptime_2 = Minfont_times.render(lap_times[0][2], None, (0, 0, 0))
-            S_best_laptime_3 = Minfont_times.render(lap_times[0][3], None, (0, 0, 0))
-            S_best_car = pygame.image.load(lap_times[0][4])
+            S_best_laptime_1 = Minfont_times.render(lap_times[1][1], None, (0, 0, 0))
+            S_best_laptime_2 = Minfont_times.render(lap_times[1][2], None, (0, 0, 0))
+            S_best_laptime_3 = Minfont_times.render(lap_times[1][3], None, (0, 0, 0))
+            S_best_car = pygame.image.load(lap_times[1][4])
             S_best_car = pygame.transform.scale(S_best_car, (27, 95))
-            R_S_best_laptime_1 = S_best_laptime_1.get_rect(center = (472, 191))
+
+            R_S_best_laptime_1 = S_best_laptime_1.get_rect(center = (472, 333))
             R_S_best_laptime_2 = S_best_laptime_1.get_rect(midtop = (R_S_best_laptime_1.centerx, R_S_best_laptime_1.bottom + 15))
             R_S_best_laptime_3 = S_best_laptime_1.get_rect(midtop = (R_S_best_laptime_2.centerx, R_S_best_laptime_2.bottom + 14))
             R_S_best_car = S_best_car.get_rect(topleft = (R_S_best_laptime_1.left - 65, R_S_best_laptime_1.top - 10))
+
+            S_back_key = Minfont_times.render("Brake", None, (0, 0, 0))
+            S_reverse_key = Minfont_times.render("Reverse", None, (0, 0, 0))
+            S_esc_key = Minfont_times.render("Menu", None, (0, 0, 0))
+            S_up_key = Minfont_times.render("Accelerate", None, (0, 0, 0))
+            S_left_key = Minfont_times.render("Left", None, (0, 0, 0))
+            S_right_key = Minfont_times.render("Right", None, (0, 0, 0))
+            
+            R_S_back_key = S_back_key.get_rect(center = (R_S_background.left + 173, R_S_background.top + 295))
+            R_S_reverse_key = S_reverse_key.get_rect(topleft = (R_S_back_key.right + 18, R_S_back_key.top))
+            R_S_esc_key = S_esc_key.get_rect(topright = (R_S_back_key.left - 32, R_S_back_key.top))
+            R_S_up_key = S_up_key.get_rect(center = (R_S_back_key.centerx, R_S_back_key.top - 125))
+            R_S_left_key = S_left_key.get_rect(topright = (R_S_up_key.centerx - 57, R_S_up_key.bottom + 32))
+            R_S_right_key = S_right_key.get_rect(topleft = (R_S_up_key.centerx + 55, R_S_left_key.top))
+            
 
             screen.blit(S_best_laps_background, R_S_best_laps_background)
             screen.blit(S_lights_background, R_S_lights_background)
             screen.blit(S_background, R_S_background)
             screen.blit(S_logo, R_S_logo)
             screen.blit(S_last_car, R_S_last_car)
+            screen.blit(S_last_laptime_text, R_S_last_laptime_text)
             screen.blit(S_last_laptime_1, R_S_last_laptime_1)
             screen.blit(S_last_laptime_2, R_S_last_laptime_2)
             screen.blit(S_last_laptime_3, R_S_last_laptime_3)
@@ -747,6 +812,13 @@ def play (team_name, chosen_car, fw, rw, topspeed, acc, braking, deg, tyre_selec
             screen.blit(S_best_laptime_1, R_S_best_laptime_1)
             screen.blit(S_best_laptime_2, R_S_best_laptime_2)
             screen.blit(S_best_laptime_3, R_S_best_laptime_3)
+            screen.blit(S_back_button, R_S_back_button)
+            screen.blit(S_back_key, R_S_back_key)
+            screen.blit(S_reverse_key, R_S_reverse_key)
+            screen.blit(S_esc_key, R_S_esc_key)
+            screen.blit(S_up_key, R_S_up_key)
+            screen.blit(S_left_key, R_S_left_key)
+            screen.blit(S_right_key, R_S_right_key)
 
 
             if R_S_lights_background.collidepoint(mouse_pos_x, mouse_pos_y):
@@ -754,12 +826,16 @@ def play (team_name, chosen_car, fw, rw, topspeed, acc, braking, deg, tyre_selec
                 if mouse_buttons[0]:
                     lights_out = True
                     lights_out_time = current_time
+            elif R_S_back_button.collidepoint(mouse_pos_x, mouse_pos_y):
+                if mouse_buttons[0]:
+                    car_set_up(team_name, lap_times)
             else:
                 S_lights_background.fill((245, 245, 245))
         
         #############################################################################################################
 
         if lights_out == True:
+            audio_soundtrack.set_volume(0.0)
             screen.blit(S_finish_line, R_S_finish_line)
             screen.blit(S_barriers_L, R_S_barriers_L3)
             screen.blit(S_pits_logos, R_S_pits_logos2)
@@ -768,7 +844,6 @@ def play (team_name, chosen_car, fw, rw, topspeed, acc, braking, deg, tyre_selec
             screen.blit(S_pits_logos, R_S_pits2)
 
             current_time -= lights_out_time - 1500
-            print(current_time, lights_out_time)
             S_lights_out = pygame.image.load("images/lights-out.png")
             S_lights_out = pygame.transform.scale(S_lights_out, (300, 50))
             R_S_lights_out = S_lights_out.get_rect(center = (300, 250))
@@ -807,13 +882,24 @@ def play (team_name, chosen_car, fw, rw, topspeed, acc, braking, deg, tyre_selec
 
 ########################################################################################################################
 
-        if laps >= 4:
-            start_menu = True
-            game_active = False
-            lights_out = False
+        
 
+        # print(end_time - start_time)
         if game_active == True:
 
+            start_time = get_lap_time(start_time)
+
+            if laps < 4:
+                end_time = datetime.datetime.now()
+                lap_times[0][lap_counter + 1] = str(end_time - start_time)[:-3]
+                Time = Minfont.render(lap_times[0][lap_counter + 1], False, "Black")
+                
+            elif laps >= 4:
+                start_menu = True
+                game_active = False
+                lights_out = False
+
+            audio_soundtrack.set_volume(0.0)
             audio_accelerating.set_volume(0.0)
             audio_braking.set_volume(0.0)
             audio_cornering.set_volume(0.0)
@@ -914,6 +1000,24 @@ def play (team_name, chosen_car, fw, rw, topspeed, acc, braking, deg, tyre_selec
             R_S_base5.x += int(car_pos_x_increment)
             R_S_barriers_L7.x += int(car_pos_x_increment)
             R_S_pits_exit.x += int(car_pos_x_increment)
+            R_S_chicane_1.x += int(car_pos_x_increment)
+
+            R_S_base6.x += int(car_pos_x_increment)
+            R_S_base7.x += int(car_pos_x_increment)
+            R_S_chicane_2.x += int(car_pos_x_increment)
+            R_S_base_final. x+= int(car_pos_x_increment)
+
+            R_S_barriers_L8.x += int(car_pos_x_increment)
+            R_S_barriers_L9.x += int(car_pos_x_increment)
+            R_S_barriers_L10.x += int(car_pos_x_increment)
+            R_S_barriers_L11.x += int(car_pos_x_increment)
+            R_S_barriers_L12.x += int(car_pos_x_increment)
+
+            R_S_barriers_R8.x += int(car_pos_x_increment)
+            R_S_barriers_R9.x += int(car_pos_x_increment)
+            R_S_barriers_R10.x += int(car_pos_x_increment)
+            R_S_barriers_R11.x += int(car_pos_x_increment)
+            R_S_barriers_R12.x += int(car_pos_x_increment)
 
             # R_S_t1.x -= int (car_pos_x_increment)
             
@@ -939,6 +1043,25 @@ def play (team_name, chosen_car, fw, rw, topspeed, acc, braking, deg, tyre_selec
             R_S_base5.y += int(car_pos_y_increment)
             R_S_barriers_L7.y += int(car_pos_y_increment)
             R_S_pits_exit.y += int(car_pos_y_increment)
+            R_S_chicane_1.y += int(car_pos_y_increment)
+            R_S_base6.y += int(car_pos_y_increment)
+            R_S_base7.y += int(car_pos_y_increment)
+            R_S_chicane_2.y += int(car_pos_y_increment)
+            R_S_base_final. y+= int(car_pos_y_increment)
+
+
+
+            R_S_barriers_L8.y += int(car_pos_y_increment)
+            R_S_barriers_L9.y += int(car_pos_y_increment)
+            R_S_barriers_L10.y += int(car_pos_y_increment)
+            R_S_barriers_L11.y += int(car_pos_y_increment)
+            R_S_barriers_L12.y += int(car_pos_y_increment)
+
+            R_S_barriers_R8.y += int(car_pos_y_increment)
+            R_S_barriers_R9.y += int(car_pos_y_increment)
+            R_S_barriers_R10.y += int(car_pos_y_increment)
+            R_S_barriers_R11.y += int(car_pos_y_increment)
+            R_S_barriers_R12.y += int(car_pos_y_increment)
 
 
 
@@ -964,7 +1087,21 @@ def play (team_name, chosen_car, fw, rw, topspeed, acc, braking, deg, tyre_selec
             screen.blit(S_start, R_S_base5)
             screen.blit(S_barriers_L, R_S_barriers_L7)
             screen.blit(S_pits_exit, R_S_pits_exit)
-
+            screen.blit(S_chicane_1, R_S_chicane_1)
+            screen.blit(S_barriers_L, R_S_barriers_L8)
+            screen.blit(S_barriers_R, R_S_barriers_R8)
+            screen.blit(S_start, R_S_base6)
+            screen.blit(S_barriers_L, R_S_barriers_L9)
+            screen.blit(S_barriers_R, R_S_barriers_R9)
+            screen.blit(S_start, R_S_base7)
+            screen.blit(S_barriers_L, R_S_barriers_L10)
+            screen.blit(S_barriers_R, R_S_barriers_R10)
+            screen.blit(S_chicane_1, R_S_chicane_2)
+            screen.blit(S_barriers_L, R_S_barriers_L11)
+            screen.blit(S_barriers_R, R_S_barriers_R11)
+            screen.blit(S_start, R_S_base_final)
+            screen.blit(S_barriers_L, R_S_barriers_L12)
+            screen.blit(S_barriers_R, R_S_barriers_R12)
 
 
             screen.blit(S_start, R_S_base2)
