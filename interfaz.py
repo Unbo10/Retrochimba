@@ -1,3 +1,7 @@
+import pygame
+from sys import exit
+import sys
+
 #Colores basicos 
 BLANCO=(255,255,255)
 NEGRO=(0,0,0)
@@ -29,8 +33,8 @@ PANTALLA= pygame.display.set_mode((500,650))
 pygame.display.set_caption('RetroChimba')
 PANTALLA.fill(BLANCO)
 #fuente 
-fuente=pygame.font.SysFont("aniME Matrix - MB_EN",20)
-fuente_titulo=pygame.font.SysFont("Britannic",50)
+fuente=pygame.font.SysFont("Minecraft.ttf",35)
+fuente_titulo=pygame.font.SysFont("Minecraft.ttf",70)
 
 
 while True:
@@ -114,14 +118,31 @@ while True:
     pygame.display.flip()
     pygame.display.update()
 
-
-
     #Utilidad de los botones:
 
     #Conecta 4
     if 125 <= x <= 125+250 and 195 <= y <= 195+50 and presionado:
+        
+        from Conect4Chimba import conecta4
         pygame.quit() 
-        from Conect4_terminado import conecta4
+
+    if 125 <= x <= 125+250 and 195 + 80 <= y <= 195+130 and presionado:
+        
+        from Chimbetris import RCtetris
+        RCtetris()
+        pygame.quit() 
+
+    if 125 <= x <= 125+250 and 195 + 80 <= y <= 195+210 and presionado:
+        
+        from Retrochimbalaga import RCGalaga
+        RCGalaga()
+        pygame.quit() 
+
+    if 125 <= x <= 125+250 and 195 + 80 <= y <= 195+290 and presionado:
+        
+        from FC import f1
+        f1()
+        pygame.quit() 
 
     #salir
     if 195 <= x <= 195+115 and 515 <= y <= 515+50 and presionado:
@@ -130,6 +151,6 @@ while True:
     
 
     for event in pygame.event.get():
-        if event.type == QUIT:
+        if event.type == pygame.QUIT:
             pygame.quit() 
             sys.exit  
